@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html id="htmlEl" lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title id="pageTitle">مدارس الإبداع الحديثة</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="img/logo.jpg" />
+  <style>
+    :root {
+      --dark-bg:    #0d1117;
+      --dark-nav:   #131a27;
+      --dark-card:  #1a2235;
+      --blue-main:  #2d5be3;
+      --blue-light: #4a7ff5;
+      --blue-text:  #5b8ef0;
+      --white:      #ffffff;
+      --gray-light: #f4f6fa;
+      --gray-text:  #8a96a8;
+      --text-dark:  #1a2235;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background-color: var(--dark-bg);
+      color: var(--white);
+      overflow-x: hidden;
+    }
+  </style>
+  <script>
+    var LOCALE = new URLSearchParams(window.location.search).get('lang') || 'ar';
+    if (LOCALE === 'en') {
+      document.getElementById('htmlEl').setAttribute('lang', 'en');
+      document.getElementById('htmlEl').setAttribute('dir', 'ltr');
+      document.getElementById('pageTitle').textContent = 'Modern Creativity Schools';
+    }
+    var trans = {
+      "مدارس الإبداع الحديثة": "Modern Creativity Schools",
+      "الإبداع الحديثة": "Modern Creativity",
+      "الرئيسية": "Home",
+      "تواصل معنا": "Contact Us",
+      "المراحل الدراسية": "Grade Levels",
+      "الخدمات": "Services",
+      "عن المدرسة": "About Us",
+      "تسجيل دخول": "Login",
+      "التعليم الشامل": "Comprehensive Education",
+      "مرحبًا بكم في": "Welcome To",
+      "نبني جيلاً واعياً في بيئة تعليمية متكاملة": "Building a conscious generation in an integrated educational environment",
+      "احجز مقعدك": "Book Your Seat",
+      "تعرف علينا أكثر": "Learn More",
+      "تعرف علينا": "About Us",
+      "عن المدرسة": "About The School",
+      "نؤمن أن التعليم الجيد يصنع الفرق. لذلك بنينا مدرسة تجمع بين المنهج الأكاديمي المتميز والبيئة التي تلهم الطالب وتدفعه للأمام.": "We believe quality education makes a difference. That's why we built a school that combines an excellent academic curriculum with an environment that inspires and motivates students.",
+      "طالب وطالبة": "Students",
+      "كادر تعليمي": "Teaching Staff",
+      "سنة خبرة": "Years Experience",
+      "ما نقدمه": "What We Offer",
+      "الخدمات": "Services",
+      "الأنشطة الطلابية": "Student Activities",
+      "مجتمع صغير يصنع شخصية كبيرة — نوادي تنمي الانتماء وتبني الصداقات.": "A small community builds a big personality — clubs that foster belonging and friendships.",
+      "أنشطة فنية": "Art Activities",
+      "الإبداع لغة يتحدثها كل طالب — فرص فنية تكتشف المواهب وتصقلها الآن.": "Creativity is a language every student speaks — artistic opportunities that discover and refine talents.",
+      "مختبرات علمية": "Science Labs",
+      "تتعلم بالتجربة لا بالحفظ — مختبرات مجهزة تحول النظرية إلى واقع.": "Learn by experiment, not memorization — equipped labs turn theory into reality.",
+      "مقصف صحي ومتوازن": "Healthy Cafeteria",
+      "وجبات صحية متوازنة تعزز تركيز الطالب وطاقته طوال اليوم الدراسي.": "Balanced healthy meals enhance student focus and energy throughout the school day.",
+      "منصات التعليم الذكي": "Smart Learning Platforms",
+      "تعلّم في أي وقت ومن أي مكان — منصات تفاعلية تجعل المعرفة في متناول يدك.": "Learn anytime, anywhere — interactive platforms make knowledge accessible.",
+      "مكتبة متكاملة": "Integrated Library",
+      "كل كتاب باب لعالم جديد — مكتبة غنية تُشعل شغف القراءة والبحث.": "Every book is a door to a new world — a rich library that ignites the passion for reading and research.",
+      "ورش العمل المهنية": "Professional Workshops",
+      "مهارات اليوم وظائف الغد — نُعد طلابنا لسوق العمل منذ الآن.": "Today's skills, tomorrow's jobs — we prepare students for the job market from now.",
+      "أنشطة رياضية": "Sports Activities",
+      "جسم صحي عقل متفتح — برامج رياضية تبني الطالب من الداخل والخارج.": "A healthy body, an open mind — sports programs build students inside and out.",
+      "التعليم لكل المراحل": "Education For All Levels",
+      "الصف الأول": "First Grade",
+      "خطوة في رحلة العلم — نبني الأساس بأسلوب ممتع يُحبّب الطفل بالتعلم.": "A step in the journey of knowledge — we build the foundation in a fun way that makes children love learning.",
+      "الصف الثاني": "Second Grade",
+      "جذور تتعمق — نوسّع آفاق الطالب في الرياضيات والعلوم واللغة بثقة وتدرج.": "Roots deepen — we expand the student's horizons in math, science, and language with confidence and progression.",
+      "الصف الثالث": "Third Grade",
+      "فضول بلا حدود — نفتح الطالب أمام أبواب جديدة ونرشّح ما تعلمه.": "Curiosity without limits — we open new doors and refine what they have learned.",
+      "الصف الرابع": "Fourth Grade",
+      "عقل يفكر وشخصية تتضح — نطور مهارات التحليل والتواصل جنبًا إلى جنب.": "A thinking mind and a clear personality — we develop analysis and communication skills side by side.",
+      "الصف الخامس": "Fifth Grade",
+      "على أعتاب مرحلة جديدة — نهيّء الطالب بكل ما يحتاجه من علم وثقة وجاهزية.": "On the threshold of a new stage — we prepare the student with all the knowledge, confidence and readiness needed.",
+      "نحن هنا لمساعدتك": "We Are Here To Help",
+      "تواصل": "Contact",
+      "معنا": "Us",
+      "الاسم الكامل": "Full Name",
+      "البريد الإلكتروني": "Email",
+      "الرسالة": "Message",
+      "إرسال الرسالة": "Send Message",
+      "العنوان": "Address",
+      "فلسطين، غزة": "Palestine, Gaza",
+      "الهاتف": "Phone",
+      "ساعات الدوام": "Working Hours",
+      "الأحد — الخميس، 8 ص — 3 م": "Sunday — Thursday, 8 AM — 3 PM",
+      "روابط سريعة": "Quick Links",
+      "© 2026 مدرسة الإبداع الحديثة. جميع الحقوق محفوظة.": "© 2026 Modern Creativity School. All rights reserved.",
+      "فيسبوك": "Facebook",
+      "انستقرام": "Instagram",
+      "واتساب": "WhatsApp",
+      "نزرع اليوم ما يحصده الوطن غداً.": "We plant today what the nation reaps tomorrow.",
+      "طلب التحاق": "Enrollment Request",
+      "تقديم طلب التحاق لابنك — سيتم إنشاء حساب لك ولي أمر بعد الموافقة": "Submit an enrollment request for your child — a parent account will be created after approval",
+      "بيانات ولي الأمر (أنت)": "Parent Information (You)",
+      "رقم الجوال": "Mobile Number",
+      "بيانات الطالب (ابنك)": "Student Information (Your Child)",
+      "الاسم الكامل للطالب": "Student Full Name",
+      "تاريخ الميلاد": "Date of Birth",
+      "المرحلة الدراسية": "Grade Level",
+      "إرسال طلب الالتحاق": "Submit Enrollment",
+      "أهلاً وسهلاً بك": "Welcome",
+      "حدد طريقة الدخول": "Choose login method",
+      "تسجيل دخول كـ": "Login as",
+      "كلمة المرور": "Password",
+      "دخول": "Login",
+      "تغيير نوع المستخدم": "Change user type",
+      "حدث خطأ": "An error occurred",
+      "يرجى ملء جميع الحقول الأساسية.": "Please fill in all required fields.",
+      "عمر الطالب": "Student Age",
+      "سنة": "year",
+      "لا يتناسب مع": "does not match",
+      "المناسب:": "Expected:",
+      "يرجى ملء جميع الحقول": "Please fill in all fields",
+      "يرجى إدخال البريد الإلكتروني وكلمة المرور": "Please enter email and password",
+      "تم تسجيل الدخول بنجاح!": "Login successful!",
+      "طالب": "Student",
+      "ولي أمر": "Parent",
+      "معلم": "Teacher",
+      "أدمن": "Admin",
+      "محمد أحمد": "Mohammed Ahmed",
+      "بريد@example.com": "mail@example.com",
+      "بريدك@example.com": "you@example.com",
+      "05XXXXXXX": "05XXXXXXX",
+      "خالد محمد أحمد": "Khaled Mohammed Ahmed",
+      "— اختر المرحلة —": "— Select Grade —",
+      "اكتب رسالتك هنا...": "Write your message here...",
+      "صورة المدرسة": "School Image",
+      "••••••••": "••••••••"
+    };
+    function __(text) {
+      if (LOCALE === 'en' && trans[text]) return trans[text];
+      return text;
+    }
+  </script>
+</head>
+<body>
+
+  <div id="comp-nav"></div>
+  <div id="comp-hero"></div>
+  <div id="comp-about"></div>
+  <div id="comp-services"></div>
+  <div id="comp-stages"></div>
+  <div id="comp-contact"></div>
+  <div id="comp-footer"></div>
+  <div id="comp-modal"></div>
+  <div id="comp-login"></div>
+
+  <script src="components.js"></script>
+  <script src="script.js"></script>
+
+</body>
+</html>
