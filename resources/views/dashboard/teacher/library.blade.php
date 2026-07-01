@@ -12,10 +12,7 @@
 @stop
 
 @section('content')
-<div class="header">
-    <h1>{{ __('المكتبة') }}</h1>
-    <button class="btn btn-primary" onclick="toggleAddForm()" id="addBtn">➕ {{ __('إضافة كتاب') }}</button>
-</div>
+<button class="btn btn-primary" onclick="toggleAddForm()" id="addBtn" style="margin-bottom:14px;">➕ {{ __('إضافة كتاب') }}</button>
 
 <div id="addBookForm" style="display:none;" class="card">
     <h3 id="formTitle">{{ __('إضافة كتاب جديد') }}</h3>
@@ -88,7 +85,11 @@
         transition: all 0.2s; user-select: none;
     }
     .class-chip:hover { border-color: var(--blue-main); background: var(--blue-50); }
-    .class-chip.selected { border-color: var(--blue-main); background: #eef1fd; color: var(--blue-main); }
+    .class-chip:has(input:checked) {
+        border-color: var(--blue-main); background: #dbeafe; color: var(--blue-main);
+        box-shadow: 0 0 0 2px rgba(74,127,247,0.2);
+    }
+    .class-chip:has(input:checked)::after { content: ' ✓'; font-weight: 800; }
     .class-chip input { display: none; }
     .empty-state { text-align: center; padding: 52px 20px; color: var(--gray-text); }
     .empty-state .icon { font-size: 52px; margin-bottom: 14px; opacity: 0.6; }
@@ -122,7 +123,7 @@
         document.getElementById('bookTitle').value = '';
         document.getElementById('bookLink').value = '';
         document.getElementById('bookDesc').value = '';
-        document.querySelectorAll('.class-chip').forEach(c => c.classList.remove('selected'));
+        document.querySelectorAll('.class-chip .bookClassCb').forEach(cb => cb.checked = false);
         document.getElementById('formTitle').textContent = '{{ __("إضافة كتاب جديد") }}';
         document.getElementById('saveBtn').textContent = '💾 {{ __("حفظ") }}';
     }
@@ -171,7 +172,7 @@
 
     function renderClassesCheckboxes() {
         document.getElementById('bookClassesList').innerHTML = mySections.map(c =>
-            '<label class="class-chip" onclick="this.classList.toggle(\'selected\')">' +
+            '<label class="class-chip">' +
                 '<input type="checkbox" value="' + c.id + '" class="bookClassCb" style="display:none;">' +
                 '🏫 ' + tGrade(c.name) + ' — ' + tSection(c.section) +
             '</label>'
@@ -206,7 +207,7 @@
         document.getElementById('bookDesc').value = desc.replace(/&quot;/g, '"');
         document.querySelectorAll('.class-chip').forEach(c => {
             const cb = c.querySelector('.bookClassCb');
-            if (classIds.includes(parseInt(cb.value))) { c.classList.add('selected'); cb.checked = true; } else { c.classList.remove('selected'); cb.checked = false; }
+            cb.checked = classIds.includes(parseInt(cb.value));
         });
         document.getElementById('formTitle').textContent = '{{ __("تعديل الكتاب") }}';
         document.getElementById('saveBtn').textContent = '💾 {{ __("تحديث") }}';

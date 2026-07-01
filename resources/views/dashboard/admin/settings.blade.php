@@ -45,6 +45,21 @@
             <input id="schoolName" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;margin:5px 0 20px;font-size:16px;">
         </div>
 
+        <div class="form-group">
+            <label>{{ __('الهاتف') }}</label>
+            <input id="schoolPhone" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;margin:5px 0 20px;font-size:16px;">
+        </div>
+
+        <div class="form-group">
+            <label>{{ __('البريد الإلكتروني') }}</label>
+            <input id="schoolEmail" type="email" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;margin:5px 0 20px;font-size:16px;">
+        </div>
+
+        <div class="form-group">
+            <label>{{ __('العنوان') }}</label>
+            <textarea id="schoolAddress" rows="3" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;margin:5px 0 20px;font-size:16px;resize:vertical;"></textarea>
+        </div>
+
         <button class="btn btn-primary" onclick="saveSettings()" style="width:100%;padding:12px;font-size:15px;">💾 {{ __('حفظ الإعدادات') }}</button>
     </div>
 </div>
@@ -57,6 +72,9 @@
         document.getElementById('settingsForm').style.display = '';
 
         document.getElementById('schoolName').value = s.school_name || '';
+        document.getElementById('schoolPhone').value = s.school_phone || '';
+        document.getElementById('schoolEmail').value = s.school_email || '';
+        document.getElementById('schoolAddress').value = s.school_address || '';
 
         if (s.school_logo) {
             document.getElementById('logoImg').src = '/storage/' + s.school_logo;
@@ -97,6 +115,9 @@
         const fd = new FormData();
         fd.append('_method', 'PUT');
         fd.append('school_name', document.getElementById('schoolName').value.trim());
+        fd.append('school_phone', document.getElementById('schoolPhone').value.trim());
+        fd.append('school_email', document.getElementById('schoolEmail').value.trim());
+        fd.append('school_address', document.getElementById('schoolAddress').value.trim());
         const logo = document.getElementById('logoUpload').files[0];
         if (logo) fd.append('school_logo', logo);
         if (removeLogoFlag) fd.append('remove_logo', '1');

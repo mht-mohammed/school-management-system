@@ -30,7 +30,7 @@
             <div style="align-self:flex-end;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
                 <button class="btn btn-secondary" onclick="downloadTemplate()">{{ __('📥 تحميل القالب') }}</button>
                 <label for="fileInput" class="btn btn-primary" style="cursor:pointer;">{{ __('📂 اختيار ملف') }}</label>
-                <input id="fileInput" type="file" accept=".csv,.txt" style="display:none" onchange="document.getElementById('fileName').textContent=this.files[0]?.name||''">
+                <input id="fileInput" type="file" accept=".csv,.txt,.xlsx,.xls" style="display:none" onchange="document.getElementById('fileName').textContent=this.files[0]?.name||''">
                 <span id="fileName" style="color:#888;font-size:13px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
                 <button class="btn btn-success" onclick="importAttendance()">{{ __('⬆ رفع') }}</button>
             </div>
@@ -44,7 +44,7 @@
         <div style="display:flex;flex-wrap:wrap;gap:15px;margin-bottom:20px;">
             <div><label>{{ __('الصف') }}</label><select id="filterClass" onchange="loadReport()" style="padding:10px;border:1px solid #ddd;border-radius:8px;min-width:200px;"><option value="">{{ __('الكل') }}</option></select></div>
             <div><label>{{ __('الشهر') }}</label><input id="filterMonth" type="month" onchange="loadReport()" style="padding:10px;border:1px solid #ddd;border-radius:8px;"></div>
-            <div style="align-self:flex-end;"><button class="btn btn-primary" onclick="exportCSV()">{{ __('📥 تصدير CSV') }}</button></div>
+            <div style="align-self:flex-end;"></div>
         </div>
         <div class="loading" id="loadingReport">{{ __('جاري التحميل...') }}</div>
         <div id="reportContent" style="display:none;overflow-x:auto;"></div>
@@ -159,64 +159,74 @@
             const month = document.getElementById('filterMonth').value;
             document.getElementById('loadingReport').textContent = __('جاري التحميل...');
             document.getElementById('loadingReport').style.display = '';
+            document.getElementById('reportContent').style.display = 'none';
 
-            let url = '/admin/attendance-report?';
-            if (classId) url += 'class_id=' + classId + '&';
+            let attUrl = '/admin/attendance-report?';
+            if (classId) attUrl += 'class_id=' + classId + '&';
             if (month) {
                 const [y, m] = month.split('-');
                 const lastDay = new Date(parseInt(y), parseInt(m), 0).getDate();
-                url += 'date_from=' + y + '-' + m + '-01&date_to=' + y + '-' + m + '-' + lastDay;
+                attUrl += 'date_from=' + y + '-' + m + '-01&date_to=' + y + '-' + m + '-' + lastDay;
             }
+            const loadAttendance = apiFetch(attUrl);
+            const loadStudents = classId ? apiFetch('/admin/students?section_id=' + classId) : apiFetch('/admin/students');
 
-            apiFetch(url).then(list => {
-                allAttendance = list || [];
+            Promise.all([loadAttendance, loadStudents]).then(([attendance, students]) => {
+                allAttendance = attendance || [];
+                const allStudents = students || [];
                 document.getElementById('loadingReport').style.display = 'none';
                 const div = document.getElementById('reportContent');
 
-                if (!allAttendance.length) {
-                    div.innerHTML = '<div class="empty">' + __('لا توجد سجلات حضور') + '</div>';
+                // Build attendance map: student_id -> { present, absent, total }
+                const attMap = {};
+                allAttendance.forEach(a => {
+                    if (!attMap[a.student_id]) attMap[a.student_id] = { present: 0, absent: 0, total: 0 };
+                    attMap[a.student_id][a.status] = (attMap[a.student_id][a.status] || 0) + 1;
+                    attMap[a.student_id].total++;
+                });
+
+                // Merge with all students in the class
+                const rows = allStudents.map(s => {
+                    const stats = attMap[s.id] || { present: 0, absent: 0, total: 0 };
+                    const pct = stats.total ? Math.round((stats.present || 0) / stats.total * 100) : 0;
+                    return {
+                        name: s.user?.name || '-',
+                        avatar: s.user?.avatar,
+                        present: stats.present || 0,
+                        absent: stats.absent || 0,
+                        total: stats.total,
+                        percentage: pct,
+                    };
+                });
+
+                if (!rows.length) {
+                    div.innerHTML = '<div class="empty">' + (classId ? __('لا يوجد طلاب في هذا الصف') : __('لا يوجد طلاب')) + '</div>';
                     div.style.display = '';
                     return;
                 }
 
-                const byClass = {};
-                allAttendance.forEach(a => {
-                    const cid = a.class_id;
-                    if (!byClass[cid]) {
-                        byClass[cid] = { name: a.class?.name || __('صف ') + cid, students: {} };
-                    }
-                    const sid = a.student_id;
-                    if (!byClass[cid].students[sid]) {
-                        byClass[cid].students[sid] = { name: a.student?.user?.name || '-', avatar: a.student?.user?.avatar, present: 0, absent: 0, total: 0 };
-                    }
-                    byClass[cid].students[sid][a.status] = (byClass[cid].students[sid][a.status] || 0) + 1;
-                    byClass[cid].students[sid].total++;
+                let html = `<p><strong>${__('عدد الطلاب:')}</strong> ${toArabicNum(rows.length)}</p>`;
+                html += '<table><thead><tr><th>' + __('الطالب') + '</th><th>' + __('إجمالي') + '</th><th>' + __('حاضر') + '</th><th>' + __('غائب') + '</th><th>' + __('النسبة') + '</th></tr></thead><tbody>';
+                rows.forEach(s => {
+                    const avatar = s.avatar ? `<img src="/storage/${s.avatar}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-left:6px;">` : '';
+                    html += `<tr><td>${avatar}${s.name}</td><td>${toArabicNum(s.total)}</td><td style="color:#28a745;">${toArabicNum(s.present)}</td><td style="color:#b8232e;">${toArabicNum(s.absent)}</td><td><strong>${toArabicNum(s.percentage)}%</strong></td></tr>`;
                 });
+                html += '</tbody></table>';
 
-                let html = `<p><strong>${__('إجمالي السجلات:')}</strong> ${toArabicNum(allAttendance.length)}</p>`;
-                Object.entries(byClass).forEach(([cid, cls]) => {
-                    html += `<h4 style="margin:20px 0 10px;color:var(--blue-main);">🏫 ${cls.name}</h4>`;
-                    html += '<table><thead><tr><th>' + __('الطالب') + '</th><th>' + __('إجمالي') + '</th><th>' + __('حاضر') + '</th><th>' + __('غائب') + '</th><th>' + __('النسبة') + '</th></tr></thead><tbody>';
-                    Object.values(cls.students).forEach(s => {
-                        const pct = s.total ? Math.round((s.present || 0) / s.total * 100) : 0;
-                        const avatar = s.avatar ? `<img src="/storage/${s.avatar}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-left:6px;">` : '';
-                        html += `<tr><td>${avatar}${s.name}</td><td>${toArabicNum(s.total)}</td><td style="color:#28a745;">${toArabicNum(s.present||0)}</td><td style="color:#b8232e;">${toArabicNum(s.absent||0)}</td><td><strong>${toArabicNum(pct)}%</strong></td></tr>`;
+                if (allAttendance.length) {
+                    const dayNames = {0:__('الأحد'),1:__('الإثنين'),2:__('الثلاثاء'),3:__('الأربعاء'),4:__('الخميس'),5:__('الجمعة'),6:__('السبت')};
+                    html += '<hr><button class="btn btn-secondary" onclick="toggleDetail()">' + __('📋 عرض التفاصيل اليومية') + '</button>';
+                    html += '<div id="detailView" style="display:none;margin-top:15px;">';
+                    html += '<table><thead><tr><th>' + __('الطالب') + '</th><th>' + __('الصف') + '</th><th>' + __('التاريخ') + '</th><th>' + __('اليوم') + '</th><th>' + __('الحالة') + '</th></tr></thead><tbody>';
+                    const statusAr = { present:__('حاضر'), absent:__('غائب') };
+                    allAttendance.forEach(a => {
+                        const d = new Date(a.date + 'T00:00:00');
+                        const dayName = dayNames[d.getDay()] || '';
+                        const cls = a.status === 'present' ? 'badge-success' : 'badge-danger';
+                        html += `<tr><td>${a.student?.user?.name || '-'}</td><td>${a.class?.name || ''}</td><td>${a.date}</td><td>${dayName}</td><td><span class="badge ${cls}">${statusAr[a.status] || a.status}</span></td></tr>`;
                     });
-                    html += '</tbody></table>';
-                });
-
-                const dayNames = {0:__('الأحد'),1:__('الإثنين'),2:__('الثلاثاء'),3:__('الأربعاء'),4:__('الخميس'),5:__('الجمعة'),6:__('السبت')};
-                html += '<hr><button class="btn btn-secondary" onclick="toggleDetail()">' + __('📋 عرض التفاصيل اليومية') + '</button>';
-                html += '<div id="detailView" style="display:none;margin-top:15px;">';
-                html += '<table><thead><tr><th>' + __('الطالب') + '</th><th>' + __('الصف') + '</th><th>' + __('التاريخ') + '</th><th>' + __('اليوم') + '</th><th>' + __('الحالة') + '</th></tr></thead><tbody>';
-                const statusAr = { present:__('حاضر'), absent:__('غائب') };
-                allAttendance.forEach(a => {
-                    const d = new Date(a.date + 'T00:00:00');
-                    const dayName = dayNames[d.getDay()] || '';
-                    const cls = a.status === 'present' ? 'badge-success' : 'badge-danger';
-                    html += `<tr><td>${a.student?.user?.name || '-'}</td><td>${a.class?.name || ''}</td><td>${a.date}</td><td>${dayName}</td><td><span class="badge ${cls}">${statusAr[a.status] || a.status}</span></td></tr>`;
-                });
-                html += '</tbody></table></div>';
+                    html += '</tbody></table></div>';
+                }
 
                 div.innerHTML = html;
                 div.style.display = '';
@@ -226,21 +236,6 @@
         function toggleDetail() {
             const div = document.getElementById('detailView');
             div.style.display = div.style.display === 'none' ? '' : 'none';
-        }
-
-        function exportCSV() {
-            if (!allAttendance.length) { showToast(__('لا توجد بيانات للتصدير'), 'error'); return; }
-            const statusAr = { present:__('حاضر'), absent:__('غائب') };
-            let csv = __('الطالب') + ',' + __('التاريخ') + ',' + __('الحالة') + '\n';
-            allAttendance.forEach(a => {
-                const name = a.student?.user?.name || '-';
-                csv += `"${name}",${a.date},${statusAr[a.status] || a.status}\n`;
-            });
-            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = __('تقرير-الحضور') + '.csv';
-            a.click();
         }
 
         loadReport();

@@ -22,10 +22,6 @@
 @stop
 
 @section('content')
-<div class="header">
-    <h1>{{ __('المكتبة') }}</h1>
-</div>
-
 <div class="stats-grid" id="statsGrid">
     <div class="stat-card">
         <div class="number" id="statBooks">-</div>

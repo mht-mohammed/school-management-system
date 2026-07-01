@@ -3,44 +3,7 @@
 @section('title', __('الملف الشخصي'))
 @section('page-title', __('الملف الشخصي'))
 
-@section('sidebar')
-    <div id="profileSidebar"></div>
-    <script>
-        const role = JSON.parse(localStorage.getItem('user') || '{}').role;
-        const sidebars = {
-            admin: `
-                <a href="/admin">📊 <span>{{ __('الإحصائيات') }}</span></a>
-                <a href="/admin/enrollments">📋 <span>{{ __('طلبات الالتحاق') }}</span></a>
-                <a href="/admin/messages">✉️ <span>{{ __('رسائل التواصل') }}</span></a>
-                <a href="/admin/students">🎓 <span>{{ __('الطلاب') }}</span></a>
-                <a href="/admin/teachers">👨‍🏫 <span>{{ __('المعلمون') }}</span></a>
-                <a href="/admin/classes">🏫 <span>{{ __('الصفوف') }}</span></a>
-                <a href="/admin/subjects">📚 <span>{{ __('المواد') }}</span></a>
-                <a href="/admin/schedules">📅 <span>{{ __('الجداول') }}</span></a>
-                <a href="/admin/e-learning">💻 <span>{{ __('التعلم الإلكتروني') }}</span></a>
-                <a href="/admin/parents">👪 <span>{{ __('أولياء الأمور') }}</span></a>
-                <a href="/admin/grades-report">📊 <span>{{ __('تقرير الدرجات') }}</span></a>
-                <a href="/admin/attendance-report">📋 <span>{{ __('تقرير الحضور') }}</span></a>
-                <a href="/admin/profile-requests">🔄 <span>{{ __('طلبات التعديل') }}</span></a>
-                <a href="/admin/settings">⚙️ <span>{{ __('الإعدادات') }}</span></a>
-            `,
-            teacher: `
-                <a href="/teacher">📊 <span>{{ __('لوحتي') }}</span></a>
-                <a href="/teacher/grades">📝 <span>{{ __('الدرجات') }}</span></a>
-                <a href="/teacher/schedule">📅 <span>{{ __('جدولي') }}</span></a>
-                <a href="/teacher/e-learning">💻 <span>{{ __('التعلم الإلكتروني') }}</span></a>
-            `,
-            student: `
-                <a href="/student">📊 <span>{{ __('لوحتي') }}</span></a>
-                <a href="/student/e-learning">💻 <span>{{ __('التعلم الإلكتروني') }}</span></a>
-            `,
-            parent: `
-                <a href="/parent">👪 <span>{{ __('أبنائي') }}</span></a>
-            `,
-        };
-        document.getElementById('profileSidebar').innerHTML = sidebars[role] || '';
-    </script>
-@stop
+{{-- No sidebar section — uses layout default based on role --}}
 
 @section('content')
 <div class="card" style="max-width:600px;margin:0 auto;">

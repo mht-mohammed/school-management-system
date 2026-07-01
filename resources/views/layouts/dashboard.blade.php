@@ -201,9 +201,66 @@
             @endif
             <span class="logo-text">{{ $schoolSettings->school_name }}</span>
         </div>
-        @yield('sidebar')
+        @if(trim($__env->yieldContent('sidebar')))
+            @yield('sidebar')
+        @else
+            <div id="sidebarFallback"></div>
+            <script>
+                (function(){
+                    var u = JSON.parse(localStorage.getItem('user') || '{}');
+                    var role = u.role || '';
+                    var links = {
+                        admin: [
+                            '<a href="/admin">📊 <span>{{ __('الإحصائيات') }}</span></a>',
+                            '<a href="/admin/enrollments">📋 <span>{{ __('طلبات الالتحاق') }}</span></a>',
+                            '<a href="/admin/messages">✉️ <span>{{ __('رسائل التواصل') }}</span></a>',
+                            '<a href="/admin/students">🎓 <span>{{ __('الطلاب') }}</span></a>',
+                            '<a href="/admin/teachers">👨‍🏫 <span>{{ __('المعلمون') }}</span></a>',
+                            '<a href="/admin/classes">🏫 <span>{{ __('الصفوف') }}</span></a>',
+                            '<a href="/admin/subjects">📚 <span>{{ __('المواد') }}</span></a>',
+                            '<a href="/admin/schedules">📅 <span>{{ __('الجداول') }}</span></a>',
+                            '<a href="/admin/e-learning">💻 <span>{{ __('التعلم الإلكتروني') }}</span></a>',
+                            '<a href="/admin/library">📖 <span>{{ __('المكتبة') }}</span></a>',
+                            '<a href="/admin/parents">👪 <span>{{ __('أولياء الأمور') }}</span></a>',
+                            '<a href="/admin/grades-report">📊 <span>{{ __('تقرير الدرجات') }}</span></a>',
+                            '<a href="/admin/attendance-report">📋 <span>{{ __('تقرير الحضور') }}</span></a>',
+                            '<a href="/admin/profile-requests">🔄 <span>{{ __('طلبات التعديل') }}</span></a>',
+                            '<a href="/admin/settings">⚙️ <span>{{ __('إعدادات المدرسة') }}</span></a>',
+                        ],
+                        teacher: [
+                            '<a href="/teacher">📊 <span>{{ __('لوحتي') }}</span></a>',
+                            '<a href="/teacher/grades">📝 <span>{{ __('الدرجات') }}</span></a>',
+                            '<a href="/teacher/schedule">📅 <span>{{ __('جدولي') }}</span></a>',
+                            '<a href="/teacher/e-learning">💻 <span>{{ __('التعلم الإلكتروني') }}</span></a>',
+                            '<a href="/teacher/library">📖 <span>{{ __('المكتبة') }}</span></a>',
+                        ],
+                        student: [
+                            '<a href="/student">📊 <span>{{ __('لوحتي') }}</span></a>',
+                            '<a href="/student/e-learning">💻 <span>{{ __('التعلم الإلكتروني') }}</span></a>',
+                            '<a href="/student/library">📖 <span>{{ __('المكتبة') }}</span></a>',
+                        ],
+                        parent: [
+                            '<a href="/parent">👪 <span>{{ __('أبنائي') }}</span></a>',
+                        ],
+                    };
+                    var html = (links[role] || []).join('');
+                    document.getElementById('sidebarFallback').innerHTML = html;
+                })();
+            </script>
+        @endif
         <a href="/profile">👤 <span>{{ __('الملف الشخصي') }}</span></a>
         <a href="#" class="logout" onclick="logout()">🚪 <span>{{ __('تسجيل خروج') }}</span></a>
+        <script>
+            (function(){
+                var path = window.location.pathname.replace(/\?.*$/, '');
+                document.querySelectorAll('.sidebar a[href]').forEach(function(a) {
+                    var href = a.getAttribute('href').replace(/\?.*$/, '');
+                    if (href !== '#' && path === href) {
+                        a.classList.add('active');
+                    }
+                });
+            })();
+        </script>
     </div>
     <div class="main">
         <div class="header">

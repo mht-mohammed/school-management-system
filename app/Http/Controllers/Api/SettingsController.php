@@ -18,6 +18,9 @@ class SettingsController extends Controller
     {
         $validated = $request->validate([
             'school_name' => 'required|string|max:255',
+            'school_phone' => 'nullable|string|max:50',
+            'school_email' => 'nullable|email|max:100',
+            'school_address' => 'nullable|string|max:1000',
             'elearning_url' => 'nullable|url|max:255',
         ]);
 

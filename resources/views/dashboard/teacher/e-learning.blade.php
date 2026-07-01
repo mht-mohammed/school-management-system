@@ -8,6 +8,7 @@
     <a href="/teacher/grades">📝 <span>{{ __('الدرجات') }}</span></a>
     <a href="/teacher/schedule">📅 <span>{{ __('جدولي') }}</span></a>
     <a href="/teacher/e-learning" class="active">💻 <span>{{ __('التعلم الإلكتروني') }}</span></a>
+    <a href="/teacher/library">📖 <span>{{ __('المكتبة') }}</span></a>
 @stop
 
 @section('content')

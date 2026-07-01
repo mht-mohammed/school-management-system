@@ -7,6 +7,7 @@ use App\Models\Attendance;
 use App\Models\SchoolClass;
 use App\Models\Student;
 use Illuminate\Http\Request;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class AttendanceController extends Controller
 {
@@ -56,7 +57,7 @@ class AttendanceController extends Controller
             $query->whereDate('date', '<=', $request->date_to);
         }
 
-        return response()->json($query->latest('date')->paginate(50));
+        return response()->json($query->latest('date')->get());
     }
 
     public function downloadMonthlyTemplate(Request $request)
@@ -111,7 +112,7 @@ class AttendanceController extends Controller
         $request->validate([
             'class_id' => 'required|exists:school_classes,id',
             'month' => 'required|regex:/^\d{4}-\d{2}$/',
-            'file' => 'required|file|mimes:csv,txt',
+            'file' => 'required|file|mimes:csv,txt,xlsx,xls',
         ]);
 
         $classId = $request->class_id;
@@ -123,12 +124,24 @@ class AttendanceController extends Controller
         $daysInMonth = (int)date('t', strtotime("$year-$monthNum-01"));
 
         $path = $request->file('file')->getRealPath();
-        $handle = fopen($path, 'r');
-        $rows = [];
-        while (($line = fgetcsv($handle)) !== false) {
-            $rows[] = $line;
+        $ext = strtolower($request->file('file')->getClientOriginalExtension());
+
+        if (in_array($ext, ['xlsx', 'xls'])) {
+            $spreadsheet = IOFactory::load($path);
+            $worksheet = $spreadsheet->getActiveSheet();
+            $data = $worksheet->toArray();
+            $rows = [];
+            foreach ($data as $row) {
+                $rows[] = array_map(fn($v) => $v ?? '', $row);
+            }
+        } else {
+            $handle = fopen($path, 'r');
+            $rows = [];
+            while (($line = fgetcsv($handle)) !== false) {
+                $rows[] = $line;
+            }
+            fclose($handle);
         }
-        fclose($handle);
 
         if (count($rows) < 2) {
             return response()->json(['message' => 'الملف فارغ أو لا يحتوي على بيانات'], 422);

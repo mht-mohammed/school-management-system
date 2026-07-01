@@ -57,7 +57,7 @@ class GradeController extends Controller
         }
 
         return response()->json(
-            $query->orderBy('teacher_id')->orderBy('subject_id')->orderBy('student_id')->latest()->paginate(50)
+            $query->orderBy('teacher_id')->orderBy('subject_id')->orderBy('student_id')->latest()->get()
         );
     }
 }

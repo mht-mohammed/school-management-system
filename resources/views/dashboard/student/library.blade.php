@@ -7,14 +7,9 @@
     <a href="/student">📊 <span>{{ __('لوحتي') }}</span></a>
     <a href="/student/e-learning">💻 <span>{{ __('التعلم الإلكتروني') }}</span></a>
     <a href="/student/library" class="active">📖 <span>{{ __('المكتبة') }}</span></a>
-    <a href="/student/profile">👤 <span>{{ __('حسابي') }}</span></a>
 @stop
 
 @section('content')
-<div class="header">
-    <h1>{{ __('المكتبة') }}</h1>
-</div>
-
 <div class="card">
     <div id="booksList">
         <div class="loading">{{ __('جاري التحميل...') }}</div>

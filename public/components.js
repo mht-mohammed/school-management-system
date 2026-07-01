@@ -661,7 +661,7 @@ components["comp-modal"] = `
 }
 .modal-header h3 { color: var(--white); font-size: 18px; font-weight: 800; }
 .modal-close { background: none; border: none; color: var(--white); font-size: 22px; cursor: pointer; }
-.modal-body { padding: 30px 25px; text-align: right; direction: rtl; }
+.modal-body { padding: 30px 25px; text-align: right; direction: rtl; color: var(--text-dark); }
 .modal-body .subtitle { color: #888; font-size: 14px; margin-bottom: 25px; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 .btn-submit {
